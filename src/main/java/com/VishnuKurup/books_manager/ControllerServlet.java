@@ -863,11 +863,11 @@ public class ControllerServlet extends HttpServlet {
 	private void logCheck(HttpServletRequest request, HttpServletResponse response) {
 		
 		Account theAcct = new Account(request.getParameter("username"),
-				request.getParameter("password"),request.getParameter("userType"),null,null,null);//creating an account instance to store credentials
+				request.getParameter("password"),null,null,null,null);//creating an account instance to store credentials
 		
 		//calling the account checking function in accounts util database 
 		if(Accounts_DB.logCheck(theAcct)) {
-			
+			theAcct =Accounts_DB.getUserWhoseUsername(request.getParameter("username"));
 			if(theAcct.getAccountType().equals("librarian")) {
 				HttpSession session = request.getSession();
 				session.setAttribute("username", theAcct.getUsername());

@@ -56,8 +56,7 @@ public class Accounts_DB_Util {
 					while (myRs.next()) {
 					
 						if (myRs.getString("username").equals(theacct.getUsername())
-								&& myRs.getString("userPassword").equals(theacct.getPassword())
-								&& myRs.getString("userType").equals(theacct.getAccountType())) {
+								&& myRs.getString("userPassword").equals(theacct.getPassword())) {
 								valid_acct = true;
 								break;
 						}
@@ -161,7 +160,7 @@ public class Accounts_DB_Util {
 	         while(myRs.next()) {
 	        	 if(myRs.getString("username").equals(userName)) {
 	        		 TheAccount = new Account(myRs.getString("username"),
-								myRs.getString("userpassword"),null,myRs.getString("name"),
+								myRs.getString("userpassword"),myRs.getString("userType"),myRs.getString("name"),
 								myRs.getString("qualification"),myRs.getString("email"));
 	        	 }
 		         

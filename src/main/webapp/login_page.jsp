@@ -47,23 +47,6 @@
 						<td><label>Password:</label></td>
 						<td><input type="password" name="password" placeholder="Enter Password" /></td>
 					<tr>
-						<td>
-						Enter Type Of Login:
-						<label for="Librarian">Librarian:</label>
-						<input id ="Librarian" type = "radio" name="userType" value="librarian"/>
-						</td>
-						<td></td>
-
-					<tr/>
-					<tr>
-						<td>
-						<label for="User">User:</label>
-						<input id ="User" type = "radio" name="userType" value="user"/>
-						</td>
-						<td></td>
-
-					<tr/>
-					<tr>
 						<td><label></label></td>
 						<td><input type="submit" value="login" class="save" /></td>
 					</tr>

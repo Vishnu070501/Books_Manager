@@ -82,12 +82,12 @@ class="add-student-button"/>
 <form action="ControllerServlet" method="POST">
 <input type="hidden" name="command" value="CHECKOUTBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
-<input type="submit" value="checkout" onclick="return confirm('Do you want to update the book ${temp.title}?')"/> 
+<input type="submit" value="checkout" onclick="return confirm('Do you want to checkout the book ${temp.title}?')"/> 
 </form>
 <form action="ControllerServlet" method="POST">
 <input type="hidden" name="command" value="RESERVEBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
-<input type="submit" value="reserve" onclick="return confirm('Do you want to update the book ${temp.title}?')"/>
+<input type="submit" value="reserve" onclick="return confirm('Do you want to reserve the book ${temp.title}?')"/>
 </form>
 </td>
 </c:if>

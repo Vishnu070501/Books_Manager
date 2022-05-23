@@ -74,7 +74,7 @@ Search Books:<input type="text" name="searchText" placeholder="enter search text
 <form action="ControllerServlet" method="POST">
 <input type="hidden" name="command" value="UNRESERVEBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
-<input type="submit" value="return" onclick="return confirm('Do you want to unreserve the book ${temp.title}?')"/> 
+<input type="submit" value="unreserve" onclick="return confirm('Do you want to unreserve the book ${temp.title}?')"/> 
 </form>
 </td> 
 </c:if>
