@@ -25,7 +25,7 @@
 	<div id="container">
 		<h3>Add Book</h3>
 		
-		<form action="ControllerServlet" method="POST">
+		<form action="manageBooksServlet" method="POST">
 		
 			<input type="hidden" name="command" value="ADDBOOK" />
 						

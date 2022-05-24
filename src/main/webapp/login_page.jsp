@@ -32,7 +32,7 @@
 	<div id="container">
 		<h3>Enter Your Credentials</h3>
 		
-		<form action="ControllerServlet" method="POST">
+		<form action="loginServlet" method="POST">
 		
 			<input type="hidden" name="command" value="LOG_CHECK" />			
 			

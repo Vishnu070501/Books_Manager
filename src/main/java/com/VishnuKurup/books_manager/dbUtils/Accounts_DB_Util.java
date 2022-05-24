@@ -205,7 +205,7 @@ public class Accounts_DB_Util {
 		         myPStmt.setString(5, theAccount.getEmail());
 		         myPStmt.setString(6, oldUserName);
 		        
-		         myRs=myPStmt.executeQuery();//got the user
+		         myPStmt.execute();//got the user
 	        
 	        }
 	        else {
@@ -223,7 +223,7 @@ public class Accounts_DB_Util {
 		         myPStmt.setString(4, theAccount.getEmail());
 		         myPStmt.setString(5, oldUserName);
 		        
-		         myRs=myPStmt.executeQuery();//got the user
+		         myPStmt.execute();//got the user
 	        }
 			
 		}

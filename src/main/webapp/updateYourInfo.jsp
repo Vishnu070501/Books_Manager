@@ -25,7 +25,7 @@
 	<div id="container">
 		<h3>Update Your Info</h3>
 		
-		<form action="ControllerServlet" method="POST">
+		<form action="manageUsersServlet" method="POST">
 		
 			<input type="hidden" name="command" value="UPDATEUSER" />
 			<input type="hidden" name="myself" value="true"/>

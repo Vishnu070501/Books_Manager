@@ -28,17 +28,17 @@ Librarian's Page
 <div id ="Container">
 <div id ="Content">
 
-<form action="ControllerServlet" method="POST">
+<form action="manageUsersServlet" method="POST">
 <input type="hidden" name="command" value="VIEWUSER"/>
 <input type="submit" value="View and Manage Users"/>
 </form>
 
-<form action="ControllerServlet" method="POST">
+<form action="manageBooksServlet" method="POST">
 <input type="hidden" name="command" value="VIEWBOOKS"/>
 <input type="submit" value="View and Manage Books"/>
 </form>
 <% String username=(String)session.getAttribute("username");%>
-<form action="ControllerServlet" method="POST">
+<form action="manageUsersServlet" method="POST">
 <input type="hidden" name="command" value="LOADUSER"/>
 <input type="hidden" name="username" value="${username}"/>
 <input type="submit" value="To Manage Your Details"/>

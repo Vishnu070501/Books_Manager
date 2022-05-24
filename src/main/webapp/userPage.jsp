@@ -32,17 +32,17 @@ User's Page
 
 <% String userType=(String)session.getAttribute("userType");%>
 
-<form action="ControllerServlet" method="POST">
+<form action="manageBooksServlet" method="POST">
 <input type="hidden" name="command" value="VIEWBOOKS" />
 <input type="submit" value="View Books"/>
 </form>
 
-<form action="ControllerServlet" method="POST">
+<form action="manageEntriesServlet" method="POST">
 <input type="hidden" name="command" value="MYBOOKS" />			
 <input type="submit" value="My Books"/>
 </form>
 
-<form action="ControllerServlet" method="POST">
+<form action="manageUsersServlet" method="POST">
 <input type="hidden" name="command" value="LOADUSER" />
 <input type="hidden" name="username" value="${username}" />
 <input type="submit" value="To Manage Your Details"/>

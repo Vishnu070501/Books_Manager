@@ -28,7 +28,7 @@
 		<c:if test="${userType==\"librarian\" }"><h3>Add User</h3></c:if>
 		<c:if test="${ param.user== \"yes\" }"><h3>User Signup</h3></c:if>
 		
-		<form action="ControllerServlet" method="POST">
+		<form action="manageUsersServlet" method="POST">
 		
 			<input type="hidden" name="command" value="ADDUSER" />
 			<c:if test="${userType!=\"librarian\"}">

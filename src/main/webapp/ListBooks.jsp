@@ -23,7 +23,7 @@
 <div id = "Header">
 Books    
 
-<form action = "ControllerServlet" method="POST">
+<form action = "manageBooksServlet" method="POST">
 <input type="hidden" name="command" value="SEARCHBOOKS"/>
 Search Books:<input type="text" name="searchText" placeholder="enter search text"/>
 <input type="submit" value="search"/>
@@ -63,12 +63,12 @@ class="add-student-button"/>
 <!-- if librarian allow updates and deletes -->
 <c:if test="${userType.equals(\"librarian\") }">
 <td>
-<form action="ControllerServlet" method="POST">
+<form action="manageBooksServlet" method="POST">
 <input type="hidden" name="command" value="LOADBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
 <input type="submit" value="update" onclick="return confirm('Do you want to update the book ${temp.title}?')"/> 
 </form>
-<form action="ControllerServlet" method="POST">
+<form action="manageBooksServlet" method="POST">
 <input type="hidden" name="command" value="DELETEBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
 <input type="submit" value="delete" onclick="return confirm('Do you want to delete the book ${temp.title}?')"/> 
@@ -79,12 +79,12 @@ class="add-student-button"/>
 <!-- if normal user allow checkouts and reserves -->
 <c:if test="${userType.equals(\"user\") }">
 <td>
-<form action="ControllerServlet" method="POST">
+<form action="manageEntriesServlet" method="POST">
 <input type="hidden" name="command" value="CHECKOUTBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
 <input type="submit" value="checkout" onclick="return confirm('Do you want to checkout the book ${temp.title}?')"/> 
 </form>
-<form action="ControllerServlet" method="POST">
+<form action="manageEntriesServlet" method="POST">
 <input type="hidden" name="command" value="RESERVEBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
 <input type="submit" value="reserve" onclick="return confirm('Do you want to reserve the book ${temp.title}?')"/>
@@ -109,7 +109,7 @@ class="add-student-button"/>
 <input type="submit" value="click here to go back to mainPage"/>
 </form>
 </c:if>
-<form action="ControllerServlet" method="POST">
+<form action="manageBooksServlet" method="POST">
 <input type="hidden" name="command" value="VIEWBOOKS"/>
 <input type="submit" value="click here to view all books"/>
 </form>

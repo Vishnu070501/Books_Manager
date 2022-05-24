@@ -7,8 +7,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import com.VishnuKurup.books_manager.containers.Book;
 import com.VishnuKurup.books_manager.containers.LibraryLogbook_Entry;
 
 public class LibraryLogbook_DB_Util {
@@ -370,4 +372,65 @@ public class LibraryLogbook_DB_Util {
 				}
 				
 				return searchedEntries;			}
+
+			public void updateLogbook() {
+
+				java.util.Date today = new java.util.Date();
+				
+				List<LibraryLogbook_Entry> reservedMembers = new ArrayList<LibraryLogbook_Entry>();
+ 				
+				//updates a logbook checks if someone who has reserved the book has'nt checked it out will remove his entry and 
+				//makes the book available for checkout
+				
+				
+				try {
+					
+					//create the connection
+					Class.forName("org.postgresql.Driver");
+			         myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/books_manager",
+			            "postgres", "webstudent");
+			         
+			         myPStmt = myConn.prepareStatement("SELECT *\r\n"
+			         		+ "	FROM public.\"libraryLogbook\" where \"action\"='reserve';");
+			         
+			         myRs = myPStmt.executeQuery();
+			         while(myRs.next()) {
+
+			        	 if(today.compareTo(myRs.getDate(4))>0) {
+					         
+
+			        		 reservedMembers.add(new LibraryLogbook_Entry(myRs.getString(1),myRs.getString(2),myRs.getString(3),myRs.getDate(4),
+				        			 myRs.getInt(5),myRs.getString(6),myRs.getString(7)));
+			        	 }
+			        	
+			         }
+			         
+			         for(LibraryLogbook_Entry temp : reservedMembers) {
+			        	 
+			        	 //getting the person reserved from 
+			        	 LibraryLogbook_Entry reservedFrom = getEntry(temp.getReservedFrom(),temp.getTitle());
+			        	 
+			        	 //we have to delete there entry and the person reserving for them too 
+				         deleteEntry(temp.getUsername(),temp.getTitle());
+				         deleteEntry(reservedFrom.getUsername(),reservedFrom.getTitle());
+				         
+				         // also we have to increase the numeber of bboks inside the library
+				         Books_DB_Util books_DB = new Books_DB_Util();
+				         Book newBook = null;
+				         newBook = books_DB.get_book_whose_title(reservedFrom.getTitle());
+				         newBook.setCopiesAvail(newBook.getCopiesAvail()+1);
+				         books_DB.updateBook(newBook, newBook.getTitle());
+				         
+				         
+				         
+				         
+			         }
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+				finally {
+					close(myConn,myStmt,myRs,myPStmt);
+				}
+				
+			}
 }

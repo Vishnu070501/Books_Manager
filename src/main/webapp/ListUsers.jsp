@@ -22,7 +22,7 @@
 <div id = "Header">
 Users    
 
-<form action = "ControllerServlet" method="POST">
+<form action = "manageUsersServlet" method="POST">
 <input type="hidden" name="command" value="SEARCHUSER"/>
 Search Users:<input type="text" name="searchText" placeholder="enter search text"/>
 <input type="submit" value="search"/>
@@ -50,12 +50,12 @@ class="add-student-button"/>
 <c:forEach var="temp" items="${myUsers }">
 <!-- Update links for each of the fields -->
 <!-- this is the tag that allows you to create you automatic links that go to a certain place with the parameter set -->
-<c:url var="templink" value="ControllerServlet">
+<c:url var="templink" value="manageUsersServlet">
 <c:param name="command" value="LOADUSER"/>
 <c:param name="username" value="${temp.username}"/>
 </c:url>
 <!-- Delete links for each of the fields -->
-<c:url var="dellink" value="ControllerServlet">
+<c:url var="dellink" value="manageUsersServlet">
 <c:param name="command" value="DELETEUSER"/>
 <c:param name="username" value="${temp.username}"/>
 </c:url>
@@ -65,12 +65,12 @@ class="add-student-button"/>
 <td>${temp.email}</td>
 <td>${temp.qualification}</td>
 <td>
-<form action="ControllerServlet" method="POST">
+<form action="manageUsersServlet" method="POST">
 <input type="hidden" name="command" value="LOADUSER"/>
 <input type="hidden" name="username" value="${temp.username}"/>
 <input type="submit" value="update" onclick="return confirm('Do you want to update the details of the user ${temp.username}?')"/> 
 </form>
-<form action="ControllerServlet" method="POST">
+<form action="manageUsersServlet" method="POST">
 <input type="hidden" name="command" value="DELETEUSER"/>
 <input type="hidden" name="username" value="${temp.username}"/>
 <input type="submit" value="delete" onclick="return confirm('Do you want to delete the user ${temp.username}?')"/> 
@@ -87,7 +87,7 @@ class="add-student-button"/>
 <input type="submit" value="click here to go back to mainPage"/>
 </form>
 
-<form action="ControllerServlet" method="POST">
+<form action="manageUsersServlet" method="POST">
 <input type="hidden" name="command" value="VIEWUSER"/>
 <input type="submit" value="click here to view all users"/>
 </form>
