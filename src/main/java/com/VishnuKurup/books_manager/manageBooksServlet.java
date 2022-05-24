@@ -3,6 +3,7 @@ package com.VishnuKurup.books_manager;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -13,7 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.VishnuKurup.books_manager.containers.Book;
+import com.VishnuKurup.books_manager.containers.LibraryLogbook_Entry;
 import com.VishnuKurup.books_manager.dbUtils.Books_DB_Util;
+import com.VishnuKurup.books_manager.dbUtils.LibraryLogbook_DB_Util;
 
 /**
  * Servlet implementation class manageBooksServlet
@@ -187,6 +190,15 @@ public class manageBooksServlet extends HttpServlet {
 				
 				//pass the id to the update method in studentDB util
 				Books_DB.updateBook(myBook,request.getParameter("oldTitle"));
+				
+				//also all the Entries of the book has to be updated
+				LibraryLogbook_DB_Util logbook = new LibraryLogbook_DB_Util();
+				
+				List<LibraryLogbook_Entry> entries = logbook.getEntriesofTheBook(request.getParameter("oldTitle"));
+				for(LibraryLogbook_Entry temp : entries) {
+					temp.setTitle(request.getParameter("title"));
+					logbook.updateEntry(temp.getUsername(), request.getParameter("oldTitle"), temp);
+				}
 				
 				//list out the new list
 				viewBooks(request,response);

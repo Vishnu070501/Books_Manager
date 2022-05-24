@@ -128,6 +128,7 @@ public class LibraryLogbook_DB_Util {
 
 				ArrayList<LibraryLogbook_Entry> myEntries = new ArrayList<>();
 				try {
+					
 					//creating the connection
 					Class.forName("org.postgresql.Driver");
 					myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/books_manager",
@@ -138,6 +139,7 @@ public class LibraryLogbook_DB_Util {
 					myPStmt.setString(1, username);
 					
 					myRs = myPStmt.executeQuery();
+					
 					
 					while(myRs.next()) {
 						myEntries.add(new LibraryLogbook_Entry(myRs.getString(1),myRs.getString(2),
@@ -432,5 +434,34 @@ public class LibraryLogbook_DB_Util {
 					close(myConn,myStmt,myRs,myPStmt);
 				}
 				
+			}
+
+			public List<LibraryLogbook_Entry> getEntriesofTheBook(String title) {
+				ArrayList<LibraryLogbook_Entry> myEntries = new ArrayList<>();
+				try {
+					//creating the connection
+					Class.forName("org.postgresql.Driver");
+					myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/books_manager",
+					           "postgres", "webstudent");
+					myPStmt = myConn.prepareStatement("SELECT *\r\n"
+							+ "	FROM public.\"libraryLogbook\"\r\n"
+							+ "	where \"title\"=?;");
+					myPStmt.setString(1, title);
+					
+					myRs = myPStmt.executeQuery();
+
+					while(myRs.next()) {
+						
+						myEntries.add(new LibraryLogbook_Entry(myRs.getString(1),myRs.getString(2),
+								myRs.getString(3),myRs.getDate(4),myRs.getInt(5),myRs.getString(6),myRs.getString(7)));
+					}
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+				finally {
+					close(myConn,myStmt,myRs,myPStmt);
+				}
+				return myEntries;
 			}
 }

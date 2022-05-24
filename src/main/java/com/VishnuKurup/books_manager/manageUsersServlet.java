@@ -2,6 +2,7 @@ package com.VishnuKurup.books_manager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -12,7 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.VishnuKurup.books_manager.containers.Account;
+import com.VishnuKurup.books_manager.containers.LibraryLogbook_Entry;
 import com.VishnuKurup.books_manager.dbUtils.Accounts_DB_Util;
+import com.VishnuKurup.books_manager.dbUtils.LibraryLogbook_DB_Util;
 
 /**
  * Servlet implementation class manageUsersServlet
@@ -106,6 +109,19 @@ public class manageUsersServlet extends HttpServlet {
 		Accounts_DB.updateUser(request.getParameter("oldUsername"),
 				new Account(request.getParameter("username"),request.getParameter("password"),null,request.getParameter("name"),
 						request.getParameter("qualification"),request.getParameter("email")),request.getParameter("myself"));
+		
+		//also all his entries has to be updated
+		LibraryLogbook_DB_Util logbook = new LibraryLogbook_DB_Util();
+		
+		List<LibraryLogbook_Entry> entries = logbook.getEntriesofUsername(request.getParameter("oldUsername"));
+
+		for(LibraryLogbook_Entry temp : entries) {
+	
+			temp.setUsername(request.getParameter("username"));
+			logbook.updateEntry(request.getParameter("oldUsername"), temp.getTitle(), temp);
+		}
+		
+		
 		//showing the new list to librarian
 		if(request.getSession(false).getAttribute("userType").equals("librarian") && request.getParameter("myself").equals("false")) {
 			viewUsers(request,response);
