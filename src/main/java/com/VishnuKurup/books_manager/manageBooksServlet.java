@@ -3,7 +3,6 @@ package com.VishnuKurup.books_manager;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -194,7 +193,7 @@ public class manageBooksServlet extends HttpServlet {
 				//also all the Entries of the book has to be updated
 				LibraryLogbook_DB_Util logbook = new LibraryLogbook_DB_Util();
 				
-				List<LibraryLogbook_Entry> entries = logbook.getEntriesofTheBook(request.getParameter("oldTitle"));
+				Set<LibraryLogbook_Entry> entries = logbook.searchEntry(request.getParameter("oldTitle"), new String[] {"title"});
 				for(LibraryLogbook_Entry temp : entries) {
 					temp.setTitle(request.getParameter("title"));
 					logbook.updateEntry(temp.getUsername(), request.getParameter("oldTitle"), temp);

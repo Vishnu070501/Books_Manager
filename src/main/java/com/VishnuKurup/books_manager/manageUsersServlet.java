@@ -2,7 +2,6 @@ package com.VishnuKurup.books_manager;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -113,7 +112,7 @@ public class manageUsersServlet extends HttpServlet {
 		//also all his entries has to be updated
 		LibraryLogbook_DB_Util logbook = new LibraryLogbook_DB_Util();
 		
-		List<LibraryLogbook_Entry> entries = logbook.getEntriesofUsername(request.getParameter("oldUsername"));
+		Set<LibraryLogbook_Entry> entries = logbook.searchEntry(request.getParameter("oldUsername"),new String[]{"username"});
 
 		for(LibraryLogbook_Entry temp : entries) {
 	
@@ -121,6 +120,21 @@ public class manageUsersServlet extends HttpServlet {
 			logbook.updateEntry(request.getParameter("oldUsername"), temp.getTitle(), temp);
 		}
 		
+		//changing the usernames in the reserved for column
+		Set<LibraryLogbook_Entry> entriesByReservedFor = logbook.searchEntry(request.getParameter("oldUsername"),new String[]{"reservedFor"});
+		
+		for(LibraryLogbook_Entry temp : entriesByReservedFor) {
+			temp.setReservedFor(request.getParameter("username"));
+			logbook.updateEntry(temp.getUsername(), temp.getTitle(), temp);
+		}
+		
+		//changing the usernames in the reserved from collum
+		Set<LibraryLogbook_Entry> entriesByReservedFrom = logbook.searchEntry(request.getParameter("oldUsername"), new String[]{"reservedFrom"});
+		
+		for(LibraryLogbook_Entry temp : entriesByReservedFrom) {
+			temp.setReservedFrom(request.getParameter("username"));
+			logbook.updateEntry(temp.getUsername(), temp.getTitle(), temp);
+		}		
 		
 		//showing the new list to librarian
 		if(request.getSession(false).getAttribute("userType").equals("librarian") && request.getParameter("myself").equals("false")) {

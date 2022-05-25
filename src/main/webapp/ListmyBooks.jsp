@@ -46,7 +46,7 @@ Search Books:<input type="text" name="searchText" placeholder="enter search text
 </tr>
 
 <c:forEach var="temp" items="${entries }" varStatus="status">
-
+<c:if test="${temp.action != 'returned' }">
 <tr>
 <td>${temp.title}</td>
 <td>${temp.action}</td>
@@ -89,6 +89,7 @@ Search Books:<input type="text" name="searchText" placeholder="enter search text
 <td>${temp.reservedFor }</td>
 <td>${temp.reservedFrom }</td>
 </tr>
+</c:if>
 </c:forEach>
 </Table>
 

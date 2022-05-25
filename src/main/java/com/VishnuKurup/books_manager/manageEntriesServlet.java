@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -417,8 +418,8 @@ public class manageEntriesServlet extends HttpServlet {
 	//gets all the books owned and reserved by user 
 	private void myBooks(HttpServletRequest request, HttpServletResponse response) {
 
-		ArrayList<LibraryLogbook_Entry> entries = new ArrayList<LibraryLogbook_Entry>();
-		entries = LogBook_DB.getEntriesofUsername((String)request.getSession(false).getAttribute("username"));
+		Set<LibraryLogbook_Entry> entries = new HashSet<LibraryLogbook_Entry>();
+		entries = LogBook_DB.searchEntry((String)request.getSession(false).getAttribute("username"), new String[] {"username"});
 		SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd");
 
 		
