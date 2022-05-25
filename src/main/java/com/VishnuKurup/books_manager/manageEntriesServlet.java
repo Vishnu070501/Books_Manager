@@ -178,20 +178,42 @@ public class manageEntriesServlet extends HttpServlet {
 	//just simple deleting the entry in user's name and the book
 	private void unreserveBook(HttpServletRequest request, HttpServletResponse response) {
 		
+		
 		LibraryLogbook_Entry userEntry = LogBook_DB.getEntry((String)request.getSession(false).getAttribute("username"), request.getParameter("title")); 
 		LibraryLogbook_Entry reservedFromEntry = LogBook_DB.getEntry((userEntry.getReservedFrom()),request.getParameter("title"));
-		reservedFromEntry.setReservedFor("NA");
-		reservedFromEntry.setReservedFrom("NA");
 		
+		//if the person has checkout out that book 
+		if(reservedFromEntry.getAction().equals("checkout")) {
+			reservedFromEntry.setReservedFor("NA");
+			reservedFromEntry.setReservedFrom("NA");
+			
+			
+			//removing the name of the user from the person he has reserved
+			LogBook_DB.updateEntry(userEntry.getReservedFrom(), request.getParameter("title"), reservedFromEntry);
+			
+			//deleting the reserving persons entry
+			LogBook_DB.deleteEntry((String)request.getSession(false).getAttribute("username"), request.getParameter("title"));
+			
+			
+		}
 		
-		//removing the name of the user from the person he has reserved
-		LogBook_DB.updateEntry(userEntry.getReservedFrom(), request.getParameter("title"), reservedFromEntry);
-		
-		//deleting the reserving persons entry
-		LogBook_DB.deleteEntry((String)request.getSession(false).getAttribute("username"), request.getParameter("title"));
+		//the person has returned the book and the book is waiting to be checked out by the reserver but he unreserves
+		else {
+			
+			//just delete both the people's entry and return the book to the library
+			//deleting the reserving persons entry
+			LogBook_DB.deleteEntry((String)request.getSession(false).getAttribute("username"), request.getParameter("title"));
+			//deleting the reserver's Entry
+			LogBook_DB.deleteEntry(reservedFromEntry.getUsername(), reservedFromEntry.getTitle());
+			
+			//incrementing the book count
+			Book reservedBook = Books_DB.get_book_whose_title(request.getParameter("title"));
+			reservedBook.setCopiesAvail(reservedBook.getCopiesAvail()+1);
+			Books_DB.updateBook(reservedBook, reservedBook.getTitle());
+			
+		}
 		
 		myBooks(request,response);
-		
 		
 	}
 	////////////////////////////
@@ -398,14 +420,70 @@ public class manageEntriesServlet extends HttpServlet {
 			LogBook_DB.updateEntry((String)request.getSession(false).getAttribute("username"), request.getParameter("title"), theEntry);
 		}
 		
-		//returning the book to the library if no one has reserved
+		//if no one has reserved that Book
 		else if(theEntry.getReservedFor().equals("NA")) {
-			Book updatedBook = Books_DB.get_book_whose_title(request.getParameter("title"));
-			updatedBook.setCopiesAvail(updatedBook.getCopiesAvail()+1);
-			Books_DB.updateBook(updatedBook,updatedBook.getTitle());
+						
+			Set<LibraryLogbook_Entry> reservedEntries = LogBook_DB.searchEntry("reserve", new String[] {"action"});
 			
-			//deleting the entry
-			LogBook_DB.deleteEntry((String)request.getSession(false).getAttribute("username"),request.getParameter("title"));
+			//getting only the reserved book having the returned title
+			for (LibraryLogbook_Entry temp : reservedEntries ) {
+				if(!temp.getTitle().equals(theEntry.getTitle())) {
+					reservedEntries.remove(temp);
+				}
+			}
+			
+			//if anyone has reserved the book under the same title 
+			if (reservedEntries.size()!=0) {
+				java.util.Date earliestDueDate = new java.util.Date();
+				LibraryLogbook_Entry earliestEntry = null;
+				int loopCount = 1 ;
+				for (LibraryLogbook_Entry temp : reservedEntries) {
+					if(loopCount == 1){
+						earliestDueDate = temp.getDueDate();
+						earliestEntry = temp;
+						
+					}
+					else if(earliestDueDate.after(temp.getDueDate())) {
+						earliestDueDate = temp.getDueDate();
+						earliestEntry = temp;
+						
+					}
+				}
+				
+				//setting the returning person's action as returned and his reserved for as the reserving person's username
+				theEntry.setAction("returned");
+				theEntry.setReservedFor(earliestEntry.getUsername());
+				LogBook_DB.updateEntry(theEntry.getUsername(), theEntry.getTitle(), theEntry);
+				
+				//and breaking his connection with the old reserved from
+				LibraryLogbook_Entry oldReservedFrom = LogBook_DB.getEntry(earliestEntry.getReservedFrom(), earliestEntry.getTitle());
+				oldReservedFrom.setReservedFor("NA");
+				LogBook_DB.updateEntry(oldReservedFrom.getUsername(), oldReservedFrom.getTitle(), oldReservedFrom);
+				
+				//setting the reserving persons reserved from as the returning person(person who is returning his book earlier) 
+				earliestEntry.setReservedFrom(theEntry.getUsername());
+				//setting his due date for 2 days from the day the book was returned
+				java.util.Date today = new java.util.Date();
+				
+				Calendar cal = Calendar.getInstance();
+				
+				cal.setTime(today);
+				cal.add(Calendar.DAY_OF_MONTH, 2);
+				earliestEntry.setDueDate(cal.getTime());
+				
+				LogBook_DB.updateEntry(earliestEntry.getUsername(), earliestEntry.getTitle(), earliestEntry);
+			}
+			
+			//if no one has reserved the returning book
+			else {
+				Book updatedBook = Books_DB.get_book_whose_title(request.getParameter("title"));
+				updatedBook.setCopiesAvail(updatedBook.getCopiesAvail()+1);
+				Books_DB.updateBook(updatedBook,updatedBook.getTitle());
+				
+				//deleting the entry
+				LogBook_DB.deleteEntry((String)request.getSession(false).getAttribute("username"),request.getParameter("title"));
+			}
+			
 		}
 		
 		request.setAttribute("actionStatus", "The Book"+request.getParameter("title")+" has been returned successfully.");
