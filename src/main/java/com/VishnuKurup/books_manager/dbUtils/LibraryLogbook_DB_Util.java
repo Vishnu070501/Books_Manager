@@ -321,7 +321,8 @@ public class LibraryLogbook_DB_Util {
 			        				 myRs.getString(6), myRs.getString(7));
 			        		 
 			        		 for (LibraryLogbook_Entry temp : searchedEntries) {
-			        			 if(temp.getUsername().equals(myLibraryLogbook_Entry.getUsername())) {
+			        			 if(temp.getUsername().equals(myLibraryLogbook_Entry.getUsername()) &&
+			        					 temp.getTitle().equals(myLibraryLogbook_Entry.getTitle())) {
 			        				 add=false;
 			        				 break;
 			        			 }
@@ -346,6 +347,7 @@ public class LibraryLogbook_DB_Util {
 
 			public void updateLogbook() {
 
+
 				java.util.Date today = new java.util.Date();
 				
 				List<LibraryLogbook_Entry> reservedMembers = new ArrayList<LibraryLogbook_Entry>();
@@ -367,7 +369,7 @@ public class LibraryLogbook_DB_Util {
 			         myRs = myPStmt.executeQuery();
 			         while(myRs.next()) {
 
-			        	 if(today.compareTo(myRs.getDate(4))>0) {
+			        	 if(today.after(myRs.getDate(4))) {
 					         
 
 			        		 reservedMembers.add(new LibraryLogbook_Entry(myRs.getString(1),myRs.getString(2),myRs.getString(3),myRs.getDate(4),
@@ -385,7 +387,7 @@ public class LibraryLogbook_DB_Util {
 				         deleteEntry(temp.getUsername(),temp.getTitle());
 				         deleteEntry(reservedFrom.getUsername(),reservedFrom.getTitle());
 				         
-				         // also we have to increase the numeber of bboks inside the library
+				         // also we have to increase the number of books inside the library
 				         Books_DB_Util books_DB = new Books_DB_Util();
 				         Book newBook = null;
 				         newBook = books_DB.get_book_whose_title(reservedFrom.getTitle());

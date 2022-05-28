@@ -15,6 +15,20 @@ look at the books that are available  -->
 
 <body>
 
+<%
+if ((String)session.getAttribute("username") == null || (String)session.getAttribute("userType") == null){
+	response.sendRedirect("login_page.jsp");
+}
+%>
+
+<%
+if(session.getAttribute("userType")!=null){
+	if (session.getAttribute("userType").equals("librarian") ){
+		request.setAttribute("invalid_cred","You are not authorised to view the page");
+		request.getRequestDispatcher("login_page.jsp").forward(request, response);
+	}
+}
+%>
 
 <div id = "Wrapper">
 
@@ -32,23 +46,23 @@ User's Page
 
 <% String userType=(String)session.getAttribute("userType");%>
 
-<form action="manageBooksServlet" method="POST">
+<form action="manageBooksServlet" method="GET">
 <input type="hidden" name="command" value="VIEWBOOKS" />
 <input type="submit" value="View Books"/>
 </form>
 
-<form action="manageEntriesServlet" method="POST">
+<form action="manageEntriesServlet" method="GET">
 <input type="hidden" name="command" value="MYBOOKS" />			
 <input type="submit" value="My Books"/>
 </form>
 
-<form action="manageUsersServlet" method="POST">
+<form action="manageUsersServlet" method="GET">
 <input type="hidden" name="command" value="LOADUSER" />
-<input type="hidden" name="username" value="${username}" />
+<input type="hidden" name="Username" value="${username}" />
 <input type="submit" value="To Manage Your Details"/>
 </form>
 
-<form action="ControllerServlet" method="POST">
+<form action="ControllerServlet" method="GET">
 <input type="hidden" name="command" value="LOGOUT" />			
 <input type="submit" value="Logout"/>
 </form>

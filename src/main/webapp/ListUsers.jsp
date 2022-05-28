@@ -15,14 +15,29 @@
 <link type="text/css" rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
+<%
+session.setAttribute("servletName", "/manageUsersServlet");
+session.setAttribute("loginServletCommand" , "VIEWUSER");
+if ((String)session.getAttribute("username") == null || (String)session.getAttribute("userType") == null){
+	response.sendRedirect("login_page.jsp");
+}
+%>
 
+<%
+if(session.getAttribute("userType")!=null){
+	if (!session.getAttribute("userType").equals("librarian") ){
+		request.setAttribute("invalid_cred","You are not authorised to view the page");
+		request.getRequestDispatcher("login_page.jsp").forward(request, response);
+	}
+}
+%>
 
 <div id = "Wrapper">
 
 <div id = "Header">
 Users    
 
-<form action = "manageUsersServlet" method="POST">
+<form action = "manageUsersServlet" method="GET">
 <input type="hidden" name="command" value="SEARCHUSER"/>
 Search Users:<input type="text" name="searchText" placeholder="enter search text"/>
 <input type="submit" value="search"/>
@@ -48,29 +63,18 @@ class="add-student-button"/>
 <th>Username</th><th>Name</th><th>Email</th><th>Educational Qualification</th><th>Action</th>
 </tr>
 <c:forEach var="temp" items="${myUsers }">
-<!-- Update links for each of the fields -->
-<!-- this is the tag that allows you to create you automatic links that go to a certain place with the parameter set -->
-<c:url var="templink" value="manageUsersServlet">
-<c:param name="command" value="LOADUSER"/>
-<c:param name="username" value="${temp.username}"/>
-</c:url>
-<!-- Delete links for each of the fields -->
-<c:url var="dellink" value="manageUsersServlet">
-<c:param name="command" value="DELETEUSER"/>
-<c:param name="username" value="${temp.username}"/>
-</c:url>
 <tr>
 <td>${temp.username}</td>
 <td>${temp.name}</td>
 <td>${temp.email}</td>
 <td>${temp.qualification}</td>
 <td>
-<form action="manageUsersServlet" method="POST">
+<form action="manageUsersServlet" method="GET">
 <input type="hidden" name="command" value="LOADUSER"/>
-<input type="hidden" name="username" value="${temp.username}"/>
+<input type="hidden" name="Username" value="${temp.username}"/>
 <input type="submit" value="update" onclick="return confirm('Do you want to update the details of the user ${temp.username}?')"/> 
 </form>
-<form action="manageUsersServlet" method="POST">
+<form action="manageUsersServlet" method="GET">
 <input type="hidden" name="command" value="DELETEUSER"/>
 <input type="hidden" name="username" value="${temp.username}"/>
 <input type="submit" value="delete" onclick="return confirm('Do you want to delete the user ${temp.username}?')"/> 
@@ -82,12 +86,12 @@ class="add-student-button"/>
 
 <br/>
 
-<form action="ControllerServlet" method="POST">
+<form action="ControllerServlet" method="GET">
 <input type="hidden" name="command" value="LIBRARIANPAGE"/>
 <input type="submit" value="click here to go back to mainPage"/>
 </form>
 
-<form action="manageUsersServlet" method="POST">
+<form action="manageUsersServlet" method="GET">
 <input type="hidden" name="command" value="VIEWUSER"/>
 <input type="submit" value="click here to view all users"/>
 </form>

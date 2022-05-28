@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.VishnuKurup.books_manager.containers.Account;
 import com.VishnuKurup.books_manager.containers.LibraryLogbook_Entry;
@@ -42,8 +43,17 @@ public class manageUsersServlet extends HttpServlet {
 		//getting the command request from the page accessing the servlet
 				String cmd = request.getParameter("command");
 				
+				if(request.getSession(false)==null) {
+					request.getSession().setAttribute("loginServletCommand", cmd);
+					request.getRequestDispatcher("login_page.jsp");
+				}
+				
 				if(cmd==null) {
 					cmd="default";
+				}
+				
+				else if(cmd.equals("LOG_CHECK")){
+					cmd = (String)request.getSession(false).getAttribute("loginServletCommand");
 				}
 				
 				switch(cmd) {
@@ -179,33 +189,54 @@ public class manageUsersServlet extends HttpServlet {
 
 
 		//get the user from the update request
-		String userName = request.getParameter("username");					
+		String userName = request.getParameter("Username");		
+		 if(userName == null) {
+			 userName = (String)request.getSession(false).getAttribute("loginServletUsername");
+		 }
 	
 		//get the information on that Book from the db using the book db util
 		Account theAccount= Accounts_DB.getUserWhoseUsername(userName);
 		
-		//attach those information to the request object and dispatching it to the admin update form if admin updates
-		if(request.getSession(false).getAttribute("userType").equals("librarian") && !userName.equals(request.getSession(false).getAttribute("username"))) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("updateUserFormLibrarian.jsp");
-			request.setAttribute("theUser", theAccount);
-			
-			try {
-				dispatcher.forward(request, response);
-			} catch (ServletException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+		if( !(null ==request.getSession(false)) ) {
+			//attach those information to the request object and dispatching it to the admin update form if admin updates
+			if(request.getSession(false).getAttribute("userType").equals("librarian") && !userName.equals(request.getSession(false).getAttribute("username"))) {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("updateUserFormLibrarian.jsp");
+				request.setAttribute("theUser", theAccount);
 				
+				try {
+					dispatcher.forward(request, response);
+				} catch (ServletException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+					
+				}
+			else  {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("updateYourInfo.jsp");
+				request.setAttribute("theUser", theAccount);
+				try {
+					dispatcher.forward(request, response);
+				} catch (ServletException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		else  {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("updateYourInfo.jsp");
-			request.setAttribute("theUser", theAccount);
+		}
+		//if someone  is illegally acessing the page
+		else {
+			HttpSession session = request.getSession();
+			session.setAttribute("servletName", "/manageUsersServlet");
+			session.setAttribute("loginServletCommand" , "LOADUSER");
+			session.setAttribute("loginServletUsername", userName);
 			try {
-				dispatcher.forward(request, response);
+				request.getRequestDispatcher("login_page.jsp").forward(request, response);
 			} catch (ServletException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -213,7 +244,8 @@ public class manageUsersServlet extends HttpServlet {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			}
+		}
+		
 	}
 
 	

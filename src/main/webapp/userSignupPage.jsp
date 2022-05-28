@@ -9,43 +9,27 @@
 <html>
 
 <head>
-	<title>Add User</title>
+	<title>User Signup</title>
 
 	<link type="text/css" rel="stylesheet" href="css/style.css">
 	<link type="text/css" rel="stylesheet" href="css/add-student-style.css">	
 </head>
 
 <body>
-<%
-session.setAttribute("pageName", "/addUserForm.jsp");
-if ((String)session.getAttribute("username") == null || session.getAttribute("userType")==null ){
-	response.sendRedirect("login_page.jsp");
-}
-%>
 
-<%
-if(session.getAttribute("userType")!=null){
-	if (!session.getAttribute("userType").equals("librarian") ){
-		request.setAttribute("invalid_cred","You are not authorised to view the page");
-		request.getRequestDispatcher("login_page.jsp").forward(request, response);
-	}
-}
-%>
-
-<% String userType = (String)session.getAttribute("userType"); %>
 	<div id="wrapper">
 		<div id="header">
-			<h2>Add User</h2>
+			<h2>User Signup</h2>
 		</div>
 	</div>
 	
 	<div id="container">
-		<h3>Add User</h3>
+		<h3>User Signup</h3>
 		
 		<form action="manageUsersServlet" method="GET">
 		
 			<input type="hidden" name="command" value="ADDUSER" />
-					
+			
 			<!-- this hidden command allows us to tell the controller servlet and tell
 			what to do-->
 			

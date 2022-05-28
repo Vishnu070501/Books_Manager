@@ -16,14 +16,29 @@
 <link type="text/css" rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
+<%
+session.setAttribute("servletName", "/manageEntriesServlet");
+session.setAttribute("loginServletCommand" , "MYBOOKS");
+if (	null == (String)session.getAttribute("username")  || null == (String)session.getAttribute("userType")){
+	response.sendRedirect("login_page.jsp");
+}
+%>
 
+<%
+if(session.getAttribute("userType")!=null){
+	if (session.getAttribute("userType").equals("librarian") ){
+		request.setAttribute("invalid_cred","You are not authorised to view the page");
+		request.getRequestDispatcher("login_page.jsp").forward(request, response);
+	}
+}
+%>
 
 <div id = "Wrapper">
 
 <div id = "Header">
 Books    
 
-<form action = "manageEntriesServlet" method="POST">
+<form action = "manageEntriesServlet" method="GET">
 <input type="hidden" name="command" value="SEARCHENTRY"/>
 Search Books:<input type="text" name="searchText" placeholder="enter search text"/>
 <label>username<input type="checkbox" name="searchBy" value="username"/></label>
@@ -57,12 +72,16 @@ Search Books:<input type="text" name="searchText" placeholder="enter search text
 <!-- allow renewal and returning of checked out books -->
 <c:if test="${temp.action.equals(\"checkout\") }">
 <td>
-<form action="manageEntriesServlet" method="POST">
+
+<c:if test="${canRenew.get(status.index)}">
+<form action="manageEntriesServlet" method="GET">
 <input type="hidden" name="command" value="RENEWBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
 <input type="submit" value="renew" onclick="return confirm('Do you want to renew the due date for the book ${temp.title}?')"/> 
 </form>
-<form action="manageEntriesServlet" method="POST">
+</c:if>
+
+<form action="manageEntriesServlet" method="GET">
 <input type="hidden" name="command" value="RETURNBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
 <input type="submit" value="return" onclick="return confirm('Do you want to return the book ${temp.title}?')"/> 
@@ -73,12 +92,12 @@ Search Books:<input type="text" name="searchText" placeholder="enter search text
 <!--  allow unreserving of books if reserved Books -->
 <c:if test="${temp.action.equals(\"reserve\") }">
 <td>
-<form action="manageEntriesServlet" method="POST">
+<form action="manageEntriesServlet" method="GET">
 <input type="hidden" name="command" value="UNRESERVEBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
 <input type="submit" value="unreserve" onclick="return confirm('Do you want to unreserve the book ${temp.title}?')"/> 
 </form>
-<form action="manageEntriesServlet" method="POST">
+<form action="manageEntriesServlet" method="GET">
 <input type="hidden" name="command" value="CHECKOUTRESERVEDBOOK"/>
 <input type="hidden" name="title" value="${temp.title}"/>
 <input type="submit" value="checkout" onclick="return confirm('Do you want to unreserve the book ${temp.title}?')"/> 
@@ -94,19 +113,14 @@ Search Books:<input type="text" name="searchText" placeholder="enter search text
 </Table>
 
 <br/>
-<c:if test="${userType.equals(\"librarian\") }">
-<form action="ControllerServlet" method="POST">
-<input type="hidden" name="command" value="LIBRARIANPAGE"/>
-<input type="submit" value="click here to go back to mainPage"/>
-</form>
-</c:if>
+
 
 <c:if test="${userType.equals(\"user\") }">
-<form action="ControllerServlet" method="POST">
+<form action="ControllerServlet" method="GET">
 <input type="hidden" name="command" value="USERPAGE"/>
 <input type="submit" value="click here to go back to mainPage"/>
 </form>
-<form action="manageEntriesServlet" method="POST">
+<form action="manageEntriesServlet" method="GET">
 <input type="hidden" name="command" value="MYBOOKS" />			
 <input type="submit" value="Click here to view all Books"/>
 </form>

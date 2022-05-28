@@ -4,7 +4,7 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
-<%@ page import="java.text.*" %>
+<%@ page import="java.text.*,com.VishnuKurup.books_manager.containers.*" %>
 
 <!DOCTYPE html>
 <html>
@@ -17,6 +17,25 @@
 </head>
 
 <body>
+
+<% 
+	Book myBook1 = (Book)request.getAttribute("myBook"); 
+   String titleForUrl = String.join("+", myBook1.getTitle().split(" "));   
+   session.setAttribute("currentPage", "http://localhost:8181/books_manager/manageBooksServlet?command=LOADBOOK&title="+titleForUrl);
+   if ((String)session.getAttribute("username") == null || (String)session.getAttribute("userType") == null){
+   	response.sendRedirect("login_page.jsp");
+   }
+%>
+
+<%
+if(session.getAttribute("userType")!=null){
+	if (!session.getAttribute("userType").equals("librarian") ){
+		request.setAttribute("invalid_cred","You are not authorised to view the page");
+		request.getRequestDispatcher("login_page.jsp").forward(request, response);
+	}
+}
+%>
+
 	<div id="wrapper">
 		<div id="header">
 			<h2>Update Book</h2>
@@ -26,7 +45,7 @@
 	<div id="container">
 		<h3>Update Book</h3>
 		
-		<form action="manageBooksServlet" method="POST">
+		<form action="manageBooksServlet" method="GET">
 		
 			<input type="hidden" name="command" value="UPDATEBOOK" />
 			<input type="hidden" name="oldTitle" value="${myBook.title }"/>

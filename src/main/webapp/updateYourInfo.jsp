@@ -4,6 +4,9 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
+<%@ page import="java.text.*,com.VishnuKurup.books_manager.containers.*" %>
+
+
 
 <!DOCTYPE html>
 <html>
@@ -16,6 +19,15 @@
 </head>
 
 <body>
+<%
+Account myUser = (Account)request.getAttribute("theUser");
+session.setAttribute("servletName", "/manageUsersServlet");
+session.setAttribute("loginServletCommand" , "LOADUSER");
+session.setAttribute("loginServletUsername",myUser.getUsername());
+if ((String)session.getAttribute("username") == null || (String)session.getAttribute("userType") == null){
+	response.sendRedirect("login_page.jsp");
+}
+%>
 	<div id="wrapper">
 		<div id="header">
 			<h2>Update Your Info</h2>
@@ -25,7 +37,7 @@
 	<div id="container">
 		<h3>Update Your Info</h3>
 		
-		<form action="manageUsersServlet" method="POST">
+		<form action="manageUsersServlet" method="GET">
 		
 			<input type="hidden" name="command" value="UPDATEUSER" />
 			<input type="hidden" name="myself" value="true"/>

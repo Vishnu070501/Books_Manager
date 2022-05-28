@@ -16,6 +16,22 @@
 </head>
 
 <body>
+
+<%
+session.setAttribute("pageName", "/addBookForm.jsp");
+if ((String)session.getAttribute("username") == null || (String)session.getAttribute("userType") == null){
+	response.sendRedirect("login_page.jsp");
+}
+%>
+
+<%
+if(session.getAttribute("userType")!=null){
+	if (!session.getAttribute("userType").equals("librarian") ){
+		request.setAttribute("invalid_cred","You are not authorised to view the page");
+		request.getRequestDispatcher("login_page.jsp").forward(request, response);
+	}
+}
+%>
 	<div id="wrapper">
 		<div id="header">
 			<h2>Add Book</h2>
@@ -25,7 +41,7 @@
 	<div id="container">
 		<h3>Add Book</h3>
 		
-		<form action="manageBooksServlet" method="POST">
+		<form action="manageBooksServlet" method="GET">
 		
 			<input type="hidden" name="command" value="ADDBOOK" />
 						

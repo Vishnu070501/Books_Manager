@@ -66,45 +66,66 @@ public class loginServlet extends HttpServlet {
 		//calling the account checking function in accounts util database 
 		if(Accounts_DB.logCheck(theAcct)) {
 			
-			//updates the logbook on a daily bases 
 			
-			Thread dailyUpdate = new LogBookDailyUpdate();
-			dailyUpdate.start();
-			
-			theAcct =Accounts_DB.getUserWhoseUsername(request.getParameter("username"));
-			if(theAcct.getAccountType().equals("librarian")) {
-				HttpSession session = request.getSession();
-				session.setAttribute("username", theAcct.getUsername());
-				session.setAttribute("userType",theAcct.getAccountType());
-				RequestDispatcher dispatcher = request.getRequestDispatcher("librarianPage.jsp");
-				try {
-					dispatcher.forward(request, response);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
+
+			//if some one is logging in legally
+			if (request.getSession().getAttribute("servletName") == null && (String)request.getSession().getAttribute("pageName")==null) {
+				theAcct =Accounts_DB.getUserWhoseUsername(request.getParameter("username"));
+				if(theAcct.getAccountType().equals("librarian")) {
+					HttpSession session = request.getSession();
+					session.setAttribute("username", theAcct.getUsername());
+					session.setAttribute("userType",theAcct.getAccountType());
+					RequestDispatcher dispatcher = request.getRequestDispatcher("librarianPage.jsp");
+					try {
+						dispatcher.forward(request, response);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+				}
+				else {
+					HttpSession session = request.getSession();
+					session.setAttribute("username", theAcct.getUsername());
+					session.setAttribute("userType",theAcct.getAccountType());
+					RequestDispatcher dispatcher = request.getRequestDispatcher("userPage.jsp");
+					try {
+						dispatcher.forward(request, response);
+					} catch (ServletException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
+			
+			//if someone is searching a page illegally
 			else {
-				HttpSession session = request.getSession();
-				session.setAttribute("username", theAcct.getUsername());
-				session.setAttribute("userType",theAcct.getAccountType());
-				RequestDispatcher dispatcher = request.getRequestDispatcher("userPage.jsp");
+				theAcct =Accounts_DB.getUserWhoseUsername(request.getParameter("username"));
 				try {
-					dispatcher.forward(request, response);
-				} catch (ServletException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
+					HttpSession session = request.getSession();
+
+					session.setAttribute("username", theAcct.getUsername());
+					session.setAttribute("userType",theAcct.getAccountType());
+					
+					//for static pages like add user and and add books 
+					if (session.getAttribute("servletName")==null) {
+						request.getRequestDispatcher((String)session.getAttribute("pageName")).forward(request, response);
+					}
+					//for dyanamic pages which request has to travel through the servlet
+					else {
+						request.getRequestDispatcher((String)session.getAttribute("servletName")).forward(request, response);
+					}
+				    } catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-				
 			
 		}
 		
 		else {
-			
 			//opening the login pasge with the wrong credentials message 
 			RequestDispatcher dispatcher = request.getRequestDispatcher("login_page.jsp");
 			request.setAttribute("invalid_cred","Wrong username or password");

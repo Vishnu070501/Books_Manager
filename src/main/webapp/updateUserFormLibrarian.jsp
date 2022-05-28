@@ -4,6 +4,9 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
+<%@ page import="java.text.*,com.VishnuKurup.books_manager.containers.*" %>
+
+
 
 <!DOCTYPE html>
 <html>
@@ -16,6 +19,24 @@
 </head>
 
 <body>
+<%
+Account myUser = (Account)request.getAttribute("theUser");
+session.setAttribute("servletName", "/manageUsersServlet");
+session.setAttribute("loginServletCommand" , "LOADUSER");
+session.setAttribute("loginServletUsername",request.getParameter("Username"));
+if ((String)session.getAttribute("username") == null || (String)session.getAttribute("userType") == null){
+	response.sendRedirect("login_page.jsp");
+}
+%>
+
+<%
+if(session.getAttribute("userType")!=null){
+	if (!session.getAttribute("userType").equals("librarian") ){
+		request.setAttribute("invalid_cred","You are not authorised to view the page");
+		request.getRequestDispatcher("login_page.jsp").forward(request, response);
+	}
+}
+%>
 	<div id="wrapper">
 		<div id="header">
 			<h2>Update User</h2>
@@ -25,7 +46,7 @@
 	<div id="container">
 		<h3>Update User</h3>
 		
-		<form action="manageUsersServlet" method="POST">
+		<form action="manageUsersServlet" method="GET">
 		
 			<input type="hidden" name="command" value="UPDATEUSER" />
 			

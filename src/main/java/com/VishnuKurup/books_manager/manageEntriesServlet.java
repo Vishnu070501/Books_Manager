@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -13,8 +14,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import com.VishnuKurup.books_manager.containers.Book;
 import com.VishnuKurup.books_manager.containers.LibraryLogbook_Entry;
 import com.VishnuKurup.books_manager.dbUtils.Books_DB_Util;
@@ -49,9 +48,18 @@ public class manageEntriesServlet extends HttpServlet {
 	
 		//getting the command request from the page accessing the servlet
 		String cmd = request.getParameter("command");
+		
+		if(request.getSession(false)==null) {
+			request.getSession().setAttribute("loginServletCommand", cmd);
+			request.getRequestDispatcher("login_page.jsp");
+		}
 				
 		if(cmd==null) {
 			cmd="default";
+		}
+		
+		else if(cmd.equals("LOG_CHECK")){
+			cmd = (String)request.getSession(false).getAttribute("loginServletCommand");
 		}
 		
 		switch(cmd) {
@@ -499,7 +507,6 @@ public class manageEntriesServlet extends HttpServlet {
 		Set<LibraryLogbook_Entry> entries = new HashSet<LibraryLogbook_Entry>();
 		entries = LogBook_DB.searchEntry((String)request.getSession(false).getAttribute("username"), new String[] {"username"});
 		SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd");
-
 		
 		ArrayList<String> dueDates = new ArrayList<>();
 		
@@ -508,9 +515,11 @@ public class manageEntriesServlet extends HttpServlet {
 		}
 		
 		RequestDispatcher dispatcher = request.getRequestDispatcher("ListmyBooks.jsp");
-		
+		//checking if the person can renew his books
+		ArrayList<Boolean> canRenew = canAct(entries);
 		request.setAttribute("entries", entries);
 		request.setAttribute("dueDates", dueDates);
+		request.setAttribute("canRenew", canRenew);
 		
 		try {
 			dispatcher.forward(request, response);
@@ -522,6 +531,22 @@ public class manageEntriesServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
+	}
+
+	private ArrayList<Boolean> canAct(Set<LibraryLogbook_Entry> entries) {
+		
+		ArrayList<Boolean>	can = new ArrayList<Boolean>();
+		java.util.Date today = new java.util.Date();
+		
+		for(LibraryLogbook_Entry temp : entries) {
+			long dueDateHowFarAway = temp.getDueDate().getTime() - today.getTime();
+			if (dueDateHowFarAway<=(24*60*60*1000)) {
+				can.add(true);
+			}
+			else
+				can.add(false);
+		}
+		return can;
 	}
 
 	private void checkoutBook(HttpServletRequest request, HttpServletResponse response) {
@@ -602,7 +627,9 @@ public class manageEntriesServlet extends HttpServlet {
 				//adding the parameters to the request object
 				request.setAttribute("myBooks", books);
 				request.setAttribute("publicationDates",publicationDates);
-				
+				//checking user's authority to checkout and reserve a book
+				List<Boolean> canAct =  doesPossess(books,request,response);
+				request.setAttribute("canAct", canAct);
 				
 				//dispatching the request and response 
 				try {
@@ -615,11 +642,25 @@ public class manageEntriesServlet extends HttpServlet {
 		
 	}
 	
+	//method to check if the user has the credibility to checkout or reserve the book
+		private ArrayList<Boolean> doesPossess(ArrayList<Book> books, HttpServletRequest request, HttpServletResponse response) {
+			ArrayList<Boolean> canAct = new ArrayList<Boolean>();
+			
+			for(Book temp : books) {
+				if(LogBook_DB.getEntry((String)request.getSession(false).getAttribute("username"),temp.getTitle()) == null) {
+					canAct.add(true);
+				}else
+					canAct.add(false);
+			}
+
+			return canAct;
+		}
+	
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	HttpSession session;
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);

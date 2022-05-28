@@ -21,10 +21,10 @@
 			<h1>Welcome to Central Library</h1>
 			<h2>Login Page</h2>
 			<c:if test="${not empty invalid_cred}">
-			Please Enter the Right Credentials
+			${invalid_cred}
 			</c:if>
 			<c:if test="${not empty signedUp}">
-			User has been successfully registered
+			${signedUp}
 			</c:if>
 		</div>
 	</div>
@@ -57,7 +57,7 @@
 		<div style="clear: both;"></div>
 		
 		<p>
-		<a href="addUserForm.jsp?user=yes">Click Here To Signup.</a>
+		<a href="userSignupPage.jsp">Click Here To Signup.</a>
 		</p>
 	</div>
 </body>

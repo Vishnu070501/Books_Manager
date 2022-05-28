@@ -3,6 +3,7 @@ package com.VishnuKurup.books_manager;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -11,11 +12,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.VishnuKurup.books_manager.containers.Book;
 import com.VishnuKurup.books_manager.containers.LibraryLogbook_Entry;
-import com.VishnuKurup.books_manager.dbUtils.Books_DB_Util;
-import com.VishnuKurup.books_manager.dbUtils.LibraryLogbook_DB_Util;
+import com.VishnuKurup.books_manager.dbUtils.*;
 
 /**
  * Servlet implementation class manageBooksServlet
@@ -26,7 +27,7 @@ public class manageBooksServlet extends HttpServlet {
 	
 	//to use the books database
 	private Books_DB_Util Books_DB = new Books_DB_Util();
-
+	private LibraryLogbook_DB_Util logbookDB = new LibraryLogbook_DB_Util();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -42,15 +43,22 @@ public class manageBooksServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//getting the command request from the page accessing the servlet
 				String cmd = request.getParameter("command");
+				if(request.getSession(false)==null) {
+					request.getSession().setAttribute("loginServletCommand", cmd);
+					request.getRequestDispatcher("login_page.jsp");
+				}
 				
 				if(cmd==null) {
 					cmd="default";
 				}
-		
+				else if(cmd.equals("LOG_CHECK")){
+					cmd = (String)request.getSession(false).getAttribute("loginServletCommand");
+				}
 				
 				switch(cmd) {
 				
 				case "VIEWBOOKS":
+					
 					//shows the books for the user
 					viewBooks(request,response);
 					break;
@@ -82,6 +90,7 @@ public class manageBooksServlet extends HttpServlet {
 					break;
 					
 				default:
+					
 					//takes to the login Page
 					RequestDispatcher dispatcher2 = request.getRequestDispatcher("login_page.jsp");
 					dispatcher2.forward(request, response);
@@ -106,13 +115,17 @@ public class manageBooksServlet extends HttpServlet {
 				 for (Book temp : books ) {
 					 publicationDates.add(sdf.format(temp.getPublication_date()));
 				 }
-	
+				 
 				//getting the request Dispatcher 
 				RequestDispatcher dispatcher = request.getRequestDispatcher("ListBooks.jsp");
+				
+				//checking user's authority to checkout and reserve a book
+				List<Boolean> canAct =  doesPossess(books,request,response);
 				
 				//adding the parameters to the request object
 				request.setAttribute("myBooks", books);
 				request.setAttribute("publicationDates",publicationDates);
+				request.setAttribute("canAct", canAct);
 				
 				
 				//dispatching the request and response 
@@ -126,6 +139,21 @@ public class manageBooksServlet extends HttpServlet {
 		
 	}
 	
+	
+	//method to check if the user has the credibility to checkout or reserve the book
+	private ArrayList<Boolean> doesPossess(ArrayList<Book> books, HttpServletRequest request, HttpServletResponse response) {
+		ArrayList<Boolean> canAct = new ArrayList<Boolean>();
+		
+		for(Book temp : books) {
+			if(logbookDB.getEntry((String)request.getSession(false).getAttribute("username"),temp.getTitle()) == null) {
+				canAct.add(true);
+			}else
+				canAct.add(false);
+		}
+
+		return canAct;
+	}
+
 	//to search among all the books
 	private void searchBooks(HttpServletRequest request, HttpServletResponse response) {
 		
@@ -210,24 +238,48 @@ public class manageBooksServlet extends HttpServlet {
 				String title = request.getParameter("title");
 						
 			
-		//get the information on that Book from the db using the book db util
-				Book theBook= Books_DB.get_book_whose_title(title);
-				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-				String publicationDate = sdf.format(theBook.getPublication_date());
+				if(title == null) {
+					 title = (String)request.getSession(false).getAttribute("loginServletTitle");
+				 }
 				
-		//attach those information to the request object and dispatching it to the 
-				RequestDispatcher dispatcher = request.getRequestDispatcher("updateBookForm.jsp");
-				request.setAttribute("myBook", theBook);
-				request.setAttribute("publicationDate", publicationDate);
-			
-				try {
-					dispatcher.forward(request, response);
-				} catch (ServletException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if( !(null ==request.getSession(false))){
+					//get the information on that Book from the db using the book db util
+					Book theBook= Books_DB.get_book_whose_title(title);
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					String publicationDate = sdf.format(theBook.getPublication_date());
+					
+			//attach those information to the request object and dispatching it to the 
+					RequestDispatcher dispatcher = request.getRequestDispatcher("updateBookForm.jsp");
+					request.setAttribute("myBook", theBook);
+					request.setAttribute("publicationDate", publicationDate);
+				
+					try {
+						dispatcher.forward(request, response);
+					} catch (ServletException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+		
+				//if someone  is illegally acessing the page
+				else {
+					HttpSession session = request.getSession();
+					session.setAttribute("servletName", "/manageBooksServlet");
+					session.setAttribute("loginServletCommand" , "LOADBOOK");
+					session.setAttribute("loginServletTitle", title);
+					try {
+						request.getRequestDispatcher("login_page.jsp").forward(request, response);
+					} catch (ServletException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 		
 	}

@@ -28,8 +28,17 @@ public class ControllerServlet extends HttpServlet {
 		//getting the command request from the page accessing the servlet
 		String cmd = request.getParameter("command");
 		
+		if(request.getSession(false)==null) {
+			request.getSession().setAttribute("loginServletCommand", cmd);
+			request.getRequestDispatcher("login_page.jsp");
+		}
+		
 		if(cmd==null) {
 			cmd="default";
+		}
+		
+		else if(cmd.equals("LOG_CHECK")){
+			cmd = (String)request.getSession(false).getAttribute("loginServletCommand");
 		}
 		
 		switch (cmd) {
@@ -47,11 +56,15 @@ public class ControllerServlet extends HttpServlet {
 			librarianDispatcher.forward(request, response);
 			break;
 			
+		case "LOGOUT":
+			request.getSession().invalidate();
+			RequestDispatcher login = request.getRequestDispatcher("login_page.jsp");
+			login.forward(request, response);
+			break;
 		
 		default:
 			//takes to the login Page
-			RequestDispatcher dispatcher2 = request.getRequestDispatcher("login_page.jsp");
-			dispatcher2.forward(request, response);
+			response.sendRedirect("login_page.jsp");
 			break;
 		
 		}
