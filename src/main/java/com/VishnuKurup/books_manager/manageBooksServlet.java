@@ -157,14 +157,27 @@ public class manageBooksServlet extends HttpServlet {
 	//to search among all the books
 	private void searchBooks(HttpServletRequest request, HttpServletResponse response) {
 		
-		Set<Book> theBooks = null;
+		ArrayList<Book> theBooks = null;
 		//get the information on that Book from the db using the book db util
 		theBooks = Books_DB.searchBook(request.getParameter("searchText"),request.getParameterValues("searchBy"));
 		
-		request.setAttribute("myBooks", theBooks);
+		SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd");
+
+		
+		ArrayList<String> publicationDates = new ArrayList<>();
+		 for (Book temp : theBooks ) {
+			 publicationDates.add(sdf.format(temp.getPublication_date()));
+		 }
 		
 		//viewing the users
 		RequestDispatcher dispatcher = request.getRequestDispatcher("ListBooks.jsp");
+		request.setAttribute("myBooks", theBooks);
+
+		
+		request.setAttribute("publicationDates",publicationDates);
+		//checking user's authority to checkout and reserve a book
+		List<Boolean> canAct =  doesPossess(theBooks,request,response);
+		request.setAttribute("canAct", canAct);
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException e) {

@@ -1,24 +1,22 @@
 package com.VishnuKurup.books_manager.containers;
 
-import java.util.*;
-
 public class LibraryLogbook_Entry {
 	
 	private String username;
 	private String title;
 	private String action;
-	private Date dueDate;
+	private java.util.Date dueDate;
 	private int renewalCount;
 	private String reservedFor;
 	private String reservedFrom;
-	public LibraryLogbook_Entry(String username, String title, String action, Date dueDate) {
+	public LibraryLogbook_Entry(String username, String title, String action, java.util.Date dueDate) {
 		super();
 		this.username = username;
 		this.title = title;
 		this.action = action;
 		this.dueDate = dueDate;
 	}
-	public LibraryLogbook_Entry(String username, String title, String action, Date dueDate, int renewalCount) {
+	public LibraryLogbook_Entry(String username, String title, String action, java.util.Date dueDate, int renewalCount) {
 		super();
 		this.username = username;
 		this.title = title;
@@ -41,7 +39,7 @@ public class LibraryLogbook_Entry {
 	public void setReservedFrom(String reservedFrom) {
 		this.reservedFrom = reservedFrom;
 	}
-	public LibraryLogbook_Entry(String username, String title, String action, Date dueDate, int renewalCount,
+	public LibraryLogbook_Entry(String username, String title, String action, java.util.Date dueDate, int renewalCount,
 			String reservedFor, String reservedFrom) {
 		super();
 		this.username = username;
@@ -73,10 +71,10 @@ public class LibraryLogbook_Entry {
 	public void setAction(String action) {
 		this.action = action;
 	}
-	public Date getDueDate() {
+	public java.util.Date getDueDate() {
 		return dueDate;
 	}
-	public void setDueDate(Date dueDate) {
+	public void setDueDate(java.util.Date dueDate) {
 		this.dueDate = dueDate;
 	}
 	@Override

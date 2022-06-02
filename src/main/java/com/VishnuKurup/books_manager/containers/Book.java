@@ -1,7 +1,5 @@
 package com.VishnuKurup.books_manager.containers;
 
-import java.util.Date;
-
 public class Book {
 	private String title;
 	private String author;
@@ -18,7 +16,7 @@ public class Book {
 		this.copiesAvail = copiesAvail;
 	}
 
-	public Book(String title, String author, String subject, Date publication_date, int copiesAvail) {
+	public Book(String title, String author, String subject, java.util.Date publication_date, int copiesAvail) {
 		super();
 		this.title = title;
 		this.author = author;
@@ -52,11 +50,11 @@ public class Book {
 		this.subject = subject;
 	}
 
-	public Date getPublication_date() {
+	public java.util.Date getPublication_date() {
 		return publication_date;
 	}
 
-	public void setPublication_date(Date publication_date) {
+	public void setPublication_date(java.util.Date publication_date) {
 		this.publication_date = publication_date;
 	}
 

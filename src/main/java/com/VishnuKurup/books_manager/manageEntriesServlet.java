@@ -168,7 +168,17 @@ public class manageEntriesServlet extends HttpServlet {
 		//get the information on that Book from the db using the book db util
 		theEntries = LogBook_DB.searchEntry(request.getParameter("searchText"),request.getParameterValues("searchBy"));
 		
+		SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd");
+		ArrayList<String> dueDates = new ArrayList<>();
+		
+		for(LibraryLogbook_Entry temp : theEntries ) {
+			dueDates.add(sdf.format(temp.getDueDate()));
+		}
+		ArrayList<Boolean> canRenew = canAct(theEntries);
+
 		request.setAttribute("entries", theEntries);
+		request.setAttribute("dueDates", dueDates);
+		request.setAttribute("canRenew", canRenew);
 		
 		//viewing the users
 		RequestDispatcher dispatcher = request.getRequestDispatcher("ListmyBooks.jsp");
@@ -540,7 +550,7 @@ public class manageEntriesServlet extends HttpServlet {
 		
 		for(LibraryLogbook_Entry temp : entries) {
 			long dueDateHowFarAway = temp.getDueDate().getTime() - today.getTime();
-			if (dueDateHowFarAway<=(24*60*60*1000)) {
+			if (dueDateHowFarAway<=(24*60*60*1000) && temp.getAction().equals("checkout") && temp.getRenewalCount()<2) {
 				can.add(true);
 			}
 			else

@@ -6,9 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import com.VishnuKurup.books_manager.containers.*;
 
@@ -221,9 +219,9 @@ public class Books_DB_Util {
 		}
 
 
-		public Set<Book> searchBook(String searchText, String[] searchBy) {
+		public ArrayList<Book> searchBook(String searchText, String[] searchBy) {
 
-			Set<Book> searchedBooks = new HashSet<>();
+			ArrayList<Book> searchedBooks = new ArrayList<>();
 			
 			try {
 				
@@ -253,9 +251,10 @@ public class Books_DB_Util {
 //		        	 System.out.println(myPStmt);
 		        	 while(myRs.next()) {
 		        		 boolean add =true;
-		        	 
+		        		 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		        		 java.util.Date publicationDate = sdf.parse(myRs.getString("publication_date"));
 		        		 Book myBook = new Book(myRs.getString(1),myRs.getString(2),
-		        				 myRs.getString(3),myRs.getDate(5),myRs.getInt(4));
+		        				 myRs.getString(3),publicationDate,myRs.getInt(4));
 		        		 
 		        		 for (Book temp : searchedBooks) {
 		        			 if(temp.getTitle().equals(myBook.getTitle())) {
